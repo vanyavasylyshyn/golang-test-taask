@@ -5,15 +5,20 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/vanyavasylyshyn/golang-test-task/controllers"
-
 	"github.com/gorilla/mux"
+	"github.com/vanyavasylyshyn/golang-test-task/controllers"
+	"github.com/vanyavasylyshyn/golang-test-task/models"
 )
 
 func main() {
+	models.Connect()
+
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", controllers.RootPath).Methods("GET")
+	router.HandleFunc("/api/users/new", controllers.CreateUser).Methods("POST")
+
+	router.HandleFunc("/api/credentials/me/new", controllers.CreateCredentials).Methods("GET")
 
 	port := os.Getenv("PORT")
 	if port == "" {

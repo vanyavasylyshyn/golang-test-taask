@@ -16,3 +16,12 @@ var CreateCredentials = func(w http.ResponseWriter, r *http.Request) {
 	resp := services.GenerateCredentials(userID)
 	u.Respond(w, resp)
 }
+
+// DestroyRefreshTokensForUser ...
+var DestroyRefreshTokensForUser = func(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	userID := params["userID"]
+
+	resp := services.DestroyRefreshCredentials(userID)
+	u.Respond(w, resp)
+}

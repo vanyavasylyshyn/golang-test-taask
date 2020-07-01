@@ -41,6 +41,7 @@ func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
 	}
 
 	refreshToken.Token = hashedToken
+	refreshToken.IsActive = true
 	refreshToken.User, err = primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		u.LogError("[ERROR] Converting string userID to ObjectID for refresh token: ", err)

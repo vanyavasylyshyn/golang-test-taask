@@ -12,9 +12,10 @@ import (
 
 // AccessToken ...
 type AccessToken struct {
-	ID    primitive.ObjectID `bson:"_id,omitempty"`
-	Token string             `bson:"access_token,omitempty"`
-	User  primitive.ObjectID `bson:"user_id,omitempty"`
+	ID       primitive.ObjectID `bson:"_id,omitempty"`
+	Token    string             `bson:"access_token,omitempty"`
+	User     primitive.ObjectID `bson:"user_id,omitempty"`
+	IsActive bool               `bson:"is_active,omitempty"`
 }
 
 // Generate ...
@@ -34,6 +35,7 @@ func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 	}
 
 	accessToken.Token = t
+	accessToken.IsActive = true
 	accessToken.User, err = primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		log.Print(userID)

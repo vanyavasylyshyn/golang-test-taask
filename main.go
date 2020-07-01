@@ -17,6 +17,8 @@ func main() {
 
 	router.HandleFunc("/", controllers.RootPath).Methods("GET")
 	router.HandleFunc("/api/credentials/{userID}/new", controllers.CreateCredentials).Methods("GET")
+	router.HandleFunc("/api/credentials/{userID}/refresh/destroy",
+		controllers.DestroyRefreshTokensForUser).Methods("DELETE")
 
 	port := os.Getenv("PORT")
 	if port == "" {

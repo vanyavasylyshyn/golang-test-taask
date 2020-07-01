@@ -28,15 +28,13 @@ func Connect() {
 	}
 
 	// Create client
-	dbAtlasURI := os.Getenv("db_atlas_uri")
-
-	client, err := mongo.NewClient(options.Client().ApplyURI(dbAtlasURI))
+	client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("DB_ATLAS_URI")))
 	if err != nil {
 		u.LogError("[ERROR] Create mongo client: ", err)
 	}
 
 	// Create connect
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
 		u.LogError("[ERROR] Create mongo connection: ", err)

@@ -16,9 +16,7 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", controllers.RootPath).Methods("GET")
-	router.HandleFunc("/api/users/new", controllers.CreateUser).Methods("POST")
-
-	router.HandleFunc("/api/credentials/me/new", controllers.CreateCredentials).Methods("GET")
+	router.HandleFunc("/api/credentials/{userID}/new", controllers.CreateCredentials).Methods("GET")
 
 	port := os.Getenv("PORT")
 	if port == "" {

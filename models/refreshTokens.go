@@ -18,16 +18,9 @@ type RefreshToken struct {
 	IsActive bool               `bson:"is_active,omitempty"`
 }
 
-// RefreshClaims ...
-type RefreshClaims struct {
-	UserID string
-	PairID string
-	jwt.StandardClaims
-}
-
 // Generate ...
 func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
-	claims := &RefreshClaims{
+	claims := &TokenClaims{
 		UserID: userID,
 		PairID: pairID,
 		StandardClaims: jwt.StandardClaims{

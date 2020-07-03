@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/vanyavasylyshyn/golang-test-task/helpers"
 	"github.com/vanyavasylyshyn/golang-test-task/services"
 	u "github.com/vanyavasylyshyn/golang-test-task/utils"
 )
@@ -14,6 +15,7 @@ var CreateCredentials = func(w http.ResponseWriter, r *http.Request) {
 	userID := params["userID"]
 
 	resp := services.GenerateCredentials(userID)
+
 	u.Respond(w, resp)
 }
 
@@ -23,5 +25,14 @@ var DestroyRefreshTokensForUser = func(w http.ResponseWriter, r *http.Request) {
 	userID := params["userID"]
 
 	resp := services.DestroyRefreshCredentials(userID)
+	u.Respond(w, resp)
+}
+
+// RefreshCredentials ...
+var RefreshCredentials = func(w http.ResponseWriter, r *http.Request) {
+	token := helpers.ExtractToken(r)
+
+	resp := services.RefreshCredentials(token)
+
 	u.Respond(w, resp)
 }

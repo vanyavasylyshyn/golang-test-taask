@@ -19,8 +19,8 @@ type AccessToken struct {
 	IsActive bool               `bson:"is_active,omitempty"`
 }
 
-// AccessClaims ...
-type AccessClaims struct {
+// TokenClaims ...
+type TokenClaims struct {
 	UserID string
 	PairID string
 	jwt.StandardClaims
@@ -29,7 +29,7 @@ type AccessClaims struct {
 // Generate ...
 func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 
-	claims := &AccessClaims{
+	claims := &TokenClaims{
 		UserID: userID,
 		PairID: pairID,
 		StandardClaims: jwt.StandardClaims{

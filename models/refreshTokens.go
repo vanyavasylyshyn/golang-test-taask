@@ -18,15 +18,24 @@ type RefreshToken struct {
 	IsActive bool               `bson:"is_active,omitempty"`
 }
 
+// RefreshClaims ...
+type RefreshClaims struct {
+	UserID string
+	PairID string
+	jwt.StandardClaims
+}
+
 // Generate ...
 func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
+	claims := &RefreshClaims{
+		UserID: userID,
+		PairID: pairID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+		},
+	}
 
-	token := jwt.New(jwt.SigningMethodHS512)
-
-	claims := token.Claims.(jwt.MapClaims)
-	claims["userID"] = userID
-	claims["pairID"] = pairID
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	t, err := token.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
 	if err != nil {
@@ -34,13 +43,7 @@ func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
 		return err
 	}
 
-	hashedToken, err := bcrypt.GenerateFromPassword([]byte(t), bcrypt.DefaultCost)
-	if err != nil {
-		u.LogError("[ERROR] Encryption refresh token: ", err)
-		return err
-	}
-
-	refreshToken.Token = hashedToken
+	refreshToken.Token = []byte(t)
 	refreshToken.IsActive = true
 	refreshToken.User, err = primitive.ObjectIDFromHex(userID)
 	if err != nil {
@@ -48,5 +51,17 @@ func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
 		return err
 	}
 
+	return nil
+}
+
+// EncryptToken ...
+func (refreshToken *RefreshToken) EncryptToken() error {
+	hashedToken, err := bcrypt.GenerateFromPassword([]byte(refreshToken.Token), bcrypt.DefaultCost)
+	if err != nil {
+		u.LogError("[ERROR] Encryption refresh token: ", err)
+		return err
+	}
+
+	refreshToken.Token = hashedToken
 	return nil
 }

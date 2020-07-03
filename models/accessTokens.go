@@ -8,25 +8,36 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	u "github.com/vanyavasylyshyn/golang-test-task/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // AccessToken ...
 type AccessToken struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty"`
-	Token    string             `bson:"access_token,omitempty"`
 	User     primitive.ObjectID `bson:"user_id,omitempty"`
+	Token    []byte             `bson:"access_token,omitempty"`
 	IsActive bool               `bson:"is_active,omitempty"`
+}
+
+// AccessClaims ...
+type AccessClaims struct {
+	UserID string
+	PairID string
+	jwt.StandardClaims
 }
 
 // Generate ...
 func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 
-	token := jwt.New(jwt.SigningMethodHS512)
+	claims := &AccessClaims{
+		UserID: userID,
+		PairID: pairID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+		},
+	}
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["userID"] = userID
-	claims["pairID"] = pairID
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	t, err := token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 	if err != nil {
@@ -34,7 +45,7 @@ func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 		return err
 	}
 
-	accessToken.Token = t
+	accessToken.Token = []byte(t)
 	accessToken.IsActive = true
 	accessToken.User, err = primitive.ObjectIDFromHex(userID)
 	if err != nil {
@@ -43,5 +54,17 @@ func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 		return err
 	}
 
+	return nil
+}
+
+// EncryptToken ...
+func (accessToken *AccessToken) EncryptToken() error {
+	hashedToken, err := bcrypt.GenerateFromPassword([]byte(accessToken.Token), bcrypt.DefaultCost)
+	if err != nil {
+		u.LogError("[ERROR] Encryption refresh token: ", err)
+		return err
+	}
+
+	accessToken.Token = hashedToken
 	return nil
 }

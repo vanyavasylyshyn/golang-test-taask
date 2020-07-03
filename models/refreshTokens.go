@@ -20,11 +20,14 @@ type RefreshToken struct {
 
 // Generate ...
 func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
+	tokenID := primitive.NewObjectID()
+
 	claims := &TokenClaims{
 		UserID: userID,
 		PairID: pairID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+			Id:        tokenID.String(),
 		},
 	}
 
@@ -36,6 +39,7 @@ func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
 		return err
 	}
 
+	refreshToken.ID = tokenID
 	refreshToken.Token = []byte(t)
 	refreshToken.IsActive = true
 	refreshToken.User, err = primitive.ObjectIDFromHex(userID)

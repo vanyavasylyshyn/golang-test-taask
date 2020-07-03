@@ -28,12 +28,14 @@ type TokenClaims struct {
 
 // Generate ...
 func (accessToken *AccessToken) Generate(userID string, pairID string) error {
+	tokenID := primitive.NewObjectID()
 
 	claims := &TokenClaims{
 		UserID: userID,
 		PairID: pairID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+			Id:        tokenID.String(),
 		},
 	}
 
@@ -45,6 +47,7 @@ func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 		return err
 	}
 
+	accessToken.ID = tokenID
 	accessToken.Token = []byte(t)
 	accessToken.IsActive = true
 	accessToken.User, err = primitive.ObjectIDFromHex(userID)

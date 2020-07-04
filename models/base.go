@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,6 +19,13 @@ var Client *mongo.Client
 
 // Context ...
 var Context context.Context
+
+// TokenClaims ...
+type TokenClaims struct {
+	UserID string
+	PairID string
+	jwt.StandardClaims
+}
 
 // Connect ...
 func Connect() {

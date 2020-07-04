@@ -19,13 +19,6 @@ type AccessToken struct {
 	IsActive bool               `bson:"is_active,omitempty"`
 }
 
-// TokenClaims ...
-type TokenClaims struct {
-	UserID string
-	PairID string
-	jwt.StandardClaims
-}
-
 // Generate ...
 func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 	tokenID := primitive.NewObjectID()
@@ -35,7 +28,7 @@ func (accessToken *AccessToken) Generate(userID string, pairID string) error {
 		PairID: pairID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
-			Id:        tokenID.String(),
+			Id:        tokenID.Hex(),
 		},
 	}
 

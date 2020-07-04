@@ -3,10 +3,8 @@ package services
 import (
 	"context"
 	b64 "encoding/base64"
-	"fmt"
 	"os"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/vanyavasylyshyn/golang-test-task/models"
 	u "github.com/vanyavasylyshyn/golang-test-task/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,29 +13,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// ExtractTokenMetadata ...
-func ExtractTokenMetadata(tokenString []byte, secret string) (*models.TokenClaims, error) {
-	claims := &models.TokenClaims{}
-
-	tkn, err := jwt.ParseWithClaims(string(tokenString), claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return nil, fmt.Errorf("Unexpected signing method: %v", err)
-		}
-
-		return nil, err
-	}
-	if !tkn.Valid {
-		return nil, err
-	}
-
-	return claims, nil
-}
-
-// RefreshCredentials ...
-func RefreshCredentials(refreshToken string) map[string]interface{} {
+// RefreshTokens ...
+func RefreshTokens(refreshToken string) map[string]interface{} {
 	client := models.Client
 	db := client.Database(os.Getenv("DB_NAME"))
 	refreshTokenCollection := db.Collection("refresh-tokens")
@@ -46,7 +23,7 @@ func RefreshCredentials(refreshToken string) map[string]interface{} {
 	decodedRefreshToken, err := b64.StdEncoding.DecodeString(refreshToken)
 	if err != nil {
 		u.LogError("[ERROR] Decoding from string: ", err)
-		return u.Message(false, "Internal server error.")
+		return u.Message(false, "Token is not valid.")
 	}
 
 	refreshClaims, err := ExtractTokenMetadata(decodedRefreshToken, os.Getenv("REFRESH_SECRET"))
@@ -165,8 +142,8 @@ func RefreshCredentials(refreshToken string) map[string]interface{} {
 	}
 	b64RefreshToken := b64.StdEncoding.EncodeToString(tokenDetails.RefreshToken)
 
-	result := u.Message(true, "Credentials has been created.")
-	result["accessToken"] = tokenDetails.AccessToken
+	result := u.Message(true, "Credentials has been refreshed.")
+	result["accessToken"] = string(tokenDetails.AccessToken)
 	result["refreshToken"] = b64RefreshToken
 	return result
 }

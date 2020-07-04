@@ -5,53 +5,13 @@ import (
 	b64 "encoding/base64"
 	"os"
 
-	"github.com/vanyavasylyshyn/golang-test-task/helpers"
 	"github.com/vanyavasylyshyn/golang-test-task/models"
 	u "github.com/vanyavasylyshyn/golang-test-task/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// TokenDetails ...
-type TokenDetails struct {
-	AccessToken              []byte
-	RefreshToken             []byte
-	HashedAccessTokenObject  models.AccessToken
-	HashedRefreshTokenObject models.RefreshToken
-}
-
-// CreateTokens ...
-func CreateTokens(userID string) (*TokenDetails, error) {
-	td := &TokenDetails{}
-
-	pairID := helpers.GenerateRandomUUID()
-
-	accessToken := models.AccessToken{}
-	err := accessToken.Generate(userID, pairID)
-	if err != nil {
-		return nil, err
-	}
-	refreshToken := models.RefreshToken{}
-	err = refreshToken.Generate(userID, pairID)
-	if err != nil {
-		return nil, err
-	}
-
-	td.AccessToken = accessToken.Token
-	td.RefreshToken = refreshToken.Token
-
-	err = refreshToken.EncryptToken()
-	if err != nil {
-		return nil, err
-	}
-
-	td.HashedAccessTokenObject = accessToken
-	td.HashedRefreshTokenObject = refreshToken
-
-	return td, nil
-}
-
-// GenerateCredentials ...
-func GenerateCredentials(userID string) map[string]interface{} {
+// GenerateTokens ...
+func GenerateTokens(userID string) map[string]interface{} {
 	client := models.Client
 	db := client.Database(os.Getenv("DB_NAME"))
 	accessTokenCollection := db.Collection("access-tokens")

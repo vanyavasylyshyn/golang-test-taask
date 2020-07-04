@@ -27,7 +27,7 @@ func (refreshToken *RefreshToken) Generate(userID string, pairID string) error {
 		PairID: pairID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
-			Id:        tokenID.String(),
+			Id:        tokenID.Hex(),
 		},
 	}
 

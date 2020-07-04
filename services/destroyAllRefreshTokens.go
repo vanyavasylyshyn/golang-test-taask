@@ -11,8 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// DestroyRefreshCredentials ...
-func DestroyRefreshCredentials(userID string) map[string]interface{} {
+// DestroyAllRefreshTokens ...
+func DestroyAllRefreshTokens(userID string) map[string]interface{} {
 	client := models.Client
 	db := client.Database(os.Getenv("DB_NAME"))
 	refreshTokenCollection := db.Collection("refresh-tokens")

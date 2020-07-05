@@ -71,7 +71,7 @@ func RefreshTokens(refreshToken string) map[string]interface{} {
 	accessClaims, err := ExtractTokenMetadata(accessTokenHash.Token, os.Getenv("ACCESS_SECRET"))
 	if err != nil {
 		u.LogError("[ERROR] Extracting access token metadata: ", err)
-		return u.Message(false, "")
+		return u.Message(false, "Error while refreshing.")
 	}
 
 	if accessClaims.PairID != refreshClaims.PairID {
